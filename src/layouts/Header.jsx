@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Header = () => {
   return (
     <header className="bg-amber-50 p-4">
       <div className="container mx-auto flex flex-row justify-between items-center">
-        {/* Logo */}
-        <div className="text-lg font-bold">Thrill Quest</div>
+        <div className="flex items-center space-x-2">
+          <img src={logo} alt="Thrill Quest Logo" className="w-10 h-10" />
+          <div className="text-lg font-bold">Thrill Quest</div>
+        </div>
 
         {/* Navigation Links */}
         <div className="flex flex-row space-x-8">

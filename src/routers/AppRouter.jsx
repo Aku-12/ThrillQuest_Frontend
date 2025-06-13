@@ -1,16 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import Homepage from "../pages/homepage";
+import LoginPage from "../pages/LoginPage";
+import Homepage from "../pages/Homepage";
 import MainLayout from "../layouts/MainLayout";
+import RegisterPage from "../pages/RegisterPage";
 
 const AppRouter = () => (
     <BrowserRouter>
         <Routes>
             <Route element={<MainLayout />}>
                 <Route path="/" element={<Homepage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
             </Route>
         </Routes>
     </BrowserRouter>
