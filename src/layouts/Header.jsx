@@ -3,35 +3,36 @@ import logo from "../assets/logo.png";
 
 const Header = () => {
   return (
-    <header className="bg-amber-50 p-4">
-      <div className="container mx-auto flex flex-row justify-between items-center">
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        {/* Logo */}
         <div className="flex items-center space-x-2">
-          <img src={logo} alt="Thrill Quest Logo" className="w-10 h-10" />
-          <div className="text-lg font-bold">Thrill Quest</div>
+          <img src={logo} alt="Thrill Quest Logo" className="w-8 h-8" />
+          <h1 className="text-xl font-semibold text-gray-900">Thrill Quest</h1>
         </div>
 
         {/* Navigation Links */}
-        <div className="flex flex-row space-x-8">
+        <nav className="hidden md:flex space-x-8 text-sm font-medium text-gray-700">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              isActive ? "text-indigo-600 font-semibold" : "text-gray-800"
+              isActive ? "text-black font-semibold" : "hover:text-black"
             }
           >
             Home
           </NavLink>
           <NavLink
-            to="/contact"
+            to="/explore"
             className={({ isActive }) =>
-              isActive ? "text-red-500 font-semibold" : "text-gray-800"
+              isActive ? "text-black font-semibold" : "hover:text-black"
             }
           >
             Explore
           </NavLink>
           <NavLink
-            to="/about"
+            to="/contact"
             className={({ isActive }) =>
-              isActive ? "text-blue-500 font-semibold" : "text-gray-800"
+              isActive ? "text-black font-semibold" : "hover:text-black"
             }
           >
             Contact
@@ -39,23 +40,23 @@ const Header = () => {
           <NavLink
             to="/about"
             className={({ isActive }) =>
-              isActive ? "text-blue-500 font-semibold" : "text-gray-800"
+              isActive ? "text-black font-semibold" : "hover:text-black"
             }
           >
             About Us
           </NavLink>
-        </div>
+        </nav>
 
         {/* Auth Buttons */}
-        <div className="flex space-x-8 px-5">
+        <div className="flex items-center space-x-4">
           <NavLink to="/login">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-xl">
-              Login
+            <button className="px-4 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-800 font-medium rounded-lg">
+              Log in
             </button>
           </NavLink>
           <NavLink to="/register">
-            <button className="bg-green-500 text-white px-4 py-2 rounded-xl">
-              Signup
+            <button className="px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg">
+              Sign up
             </button>
           </NavLink>
         </div>
