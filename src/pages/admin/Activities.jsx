@@ -1,177 +1,164 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import { useGetActivities, useDeleteActivity } from "../../hooks/useActivityHook";
+import { toast } from "react-toastify";
+import AddActivityModal from "./AddActivityModal"; // Modal for add/edit
 
-import { useFormik } from "formik";
+const ActivityTable = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editableActivity, setEditableActivity] = useState(null);
 
-import * as Yup from "yup";
+  const { data, isLoading, error, refetch } = useGetActivities({ search: searchTerm });
+  const deleteMutation = useDeleteActivity();
 
-import useAddActivity from "../../hooks/useAddActivity";
+  const maxBookings = data?.data?.length
+    ? Math.max(...data.data.map((item) => item.bookings || 0))
+    : 1;
 
-import useDeleteActivity from "../../hooks/useDeleteActivity";
-
-const Activities = () => {
-  const { mutate: createActivity, isLoading: isCreating } = useAddActivity();
-
-  const { mutate: deleteActivity, isLoading: isDeleting } = useDeleteActivity();
-
-  const [activities, setActivities] = useState([]);
-
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-
-      description: "",
-
-      image: null,
-    },
-
-    validationSchema: Yup.object({
-      name: Yup.string().required("Name is required"),
-
-      description: Yup.string().required("Description is required"),
-
-      image: Yup.mixed().required("Image is required"),
-    }),
-
-    onSubmit: (values, { resetForm }) => {
-      const formData = new FormData();
-
-      formData.append("name", values.name);
-
-      formData.append("description", values.description);
-
-      formData.append("image", values.image);
-
-      createActivity(formData, {
-        onSuccess: (response) => {
-          const newActivity = {
-            _id: response._id,
-
-            name: values.name,
-
-            description: values.description,
-          };
-
-          setActivities((prev) => [...prev, newActivity]);
-
-          resetForm();
+  const handleDelete = (id, activity) => {
+    if (window.confirm(`Are you sure you want to delete "${activity}"?`)) {
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          toast.success("Activity deleted successfully");
+          refetch();
+        },
+        onError: () => {
+          toast.error("Failed to delete activity");
         },
       });
-    },
-  });
-console.log(activities)
-  const handleFileChange = (e) => {
-    const file = e.currentTarget.files[0];
-
-    formik.setFieldValue("image", file);
+    }
   };
 
-  const handleDelete = (id) => {
-    deleteActivity(id, {
-      onSuccess: () => {
-        setActivities((prev) => prev.filter((a) => a._id !== id));
-      },
-    });
-  };
+  if (isLoading) return <div className="p-4">Loading activities...</div>;
+  if (error) return <div className="p-4 text-red-600">Failed to load activities.</div>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto rounded-2xl bg-white shadow">
-      <h2 className="text-2xl font-semibold text-gray-800">Add New Activity</h2>
-
-      <form onSubmit={formik.handleSubmit} className="mt-4 space-y-4">
+    <div className="p-4 font-sans">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <label className="block text-gray-600">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="mt-1 block w-full rounded-lg border p-2"
-            placeholder="e.g., Rafting"
-          />
-
-          {formik.touched.name && formik.errors.name && (
-            <div className="text-red-500 text-sm">{formik.errors.name}</div>
-          )}
+          <h2 className="text-xl font-bold text-gray-900">Activities</h2>
+          <p className="text-sm text-gray-500">Manage all adventure activities and experiences</p>
         </div>
-
-        <div>
-          <label className="block text-gray-600">Description</label>
-          <textarea
-            name="description"
-            value={formik.values.description}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="mt-1 block w-full rounded-lg border p-2"
-            placeholder="Describe the activity..."
-          />
-
-          {formik.touched.description && formik.errors.description && (
-            <div className="text-red-500 text-sm">
-              {formik.errors.description}
-            </div>
-          )}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Search activities..."
+              className="w-full sm:w-64 bg-white border border-gray-300 text-sm text-gray-800 placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <svg
+              className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <button
+            onClick={() => {
+              setEditableActivity(null); // Add new
+              setIsModalOpen(true);
+            }}
+            className="px-4 py-2 text-sm text-white bg-emerald-500 rounded-lg hover:bg-emerald-600 font-semibold flex items-center gap-2"
+          >
+            Add Activity
+          </button>
         </div>
-
-        <div>
-          <label className="block text-gray-600">Image</label>
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleFileChange}
-            onBlur={formik.handleBlur}
-            className="mt-1 block w-full"
-          />
-
-          {formik.touched.image && formik.errors.image && (
-            <div className="text-red-500 text-sm">{formik.errors.image}</div>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          disabled={isCreating}
-          className="bg-blue-600 text-white rounded-lg px-4 py-2 mt-3 hover:bg-blue-700"
-        >
-          {isCreating ? "Adding..." : "Create Activity"}
-        </button>
-      </form>
-
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">
-          Activities List
-        </h3>
-
-        {activities.length === 0 ? (
-          <p className="text-gray-500">No activities added yet.</p>
-        ) : (
-          <ul className="space-y-2">
-            {activities.map((activity, index) => (
-              <li
-                key={index}
-                className="flex items-center justify-between border rounded p-2"
-              >
-                <div>
-                  <p className="font-medium">{activity.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {activity.description}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDelete(activity._id)}
-                  disabled={isDeleting}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
+
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
+        <table className="w-full min-w-[1000px] text-left">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Image</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Activity</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Price</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Duration</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Difficulty</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Bookings</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Rating</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase">Status</th>
+              <th className="p-4 text-xs font-semibold text-gray-600 uppercase text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {data?.data?.map((item) => (
+              <tr key={item._id} className="hover:bg-gray-50">
+                <td className="p-4">
+                  <img
+          src={
+            item.images?.[0]
+              ? `http://localhost:5050${item.images[0]}`
+              : "https://placehold.co/600x400/c084fc/ffffff?text=ThrillQuest"
+          }
+          alt={item.name}
+          className="w-12 h-12 object-cover transition-transform duration-700 group-hover:scale-105 rounded-full"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "https://placehold.co/600x400/c084fc/ffffff?text=Image+Error";
+          }}
+        />
+                </td>
+                <td className="p-4">
+                  <div className="font-semibold text-base text-gray-900">{item.name}</div>
+                  <div className="text-sm text-gray-500">{item.location}</div>
+                </td>
+                <td className="p-4">
+                  <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-md text-sm font-bold">
+                    ${item.price}
+                  </div>
+                </td>
+                <td className="p-4 text-sm text-gray-600 flex items-center gap-2 pt-6">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {item.duration}
+                </td>
+                <td className="p-4 text-sm text-gray-800">{item.difficulty}</td>
+                <td className="p-4 text-sm text-gray-800">{item.bookings}</td>
+                <td className="p-4 text-sm text-gray-800">{item.rating ?? "N/A"}</td>
+                <td className="p-4 text-sm text-gray-800">{item.status}</td>
+                <td className="p-4 text-right">
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        setEditableActivity(item);
+                        setIsModalOpen(true);
+                      }}
+                      title="Edit"
+                    >
+                      <Pencil className="w-5 h-5 text-emerald-600 hover:text-emerald-800 transition" />
+                    </button>
+                    <button onClick={() => handleDelete(item._id, item.name)} title="Delete">
+                      <Trash2 className="w-5 h-5 text-red-500 hover:text-red-600 transition" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal for Add/Edit */}
+      <AddActivityModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditableActivity(null);
+        }}
+        onSuccess={() => {
+          refetch();
+          setEditableActivity(null);
+        }}
+        initialData={editableActivity}
+      />
     </div>
   );
 };
 
-export default Activities;
+export default ActivityTable;
