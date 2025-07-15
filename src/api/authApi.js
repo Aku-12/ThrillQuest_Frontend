@@ -1,4 +1,4 @@
-import instance from "./Api";
+import instance from "./api";
 
 export const registerUserApi = async (data) => {
   const response = await instance.post("/auth/register", data);
