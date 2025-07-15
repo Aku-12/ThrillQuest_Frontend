@@ -1,18 +1,23 @@
 import React from "react";
-import ActivitiesList from "./home/ActivitiesList"; // Adjust path as needed
+import HeroSection from "../components/user/components/HeroSection";
+import FeaturedAdventures from "../components/user/components/FeaturedAdventures";
+import HowItWorks from "../components/user/components/HowItWorks";
+import Testimonials from "../components/user/components/Testimonials";
+import ActivitySection from "../components/user/layouts/ActivitySection";
 
-export default function Homepage() {
+export default function HomePage() {
+  const handleBooking = (id) => {
+    console.log("Booking activity ID:", id);
+    // You can navigate or call a booking service here
+  };
+
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-800 text-center mt-4">
-        Welcome to Thrill Quest
-      </h1>
-      <p className="text-gray-600 text-center mt-2">
-        Discover thrilling activities like Rafting, Rock Climbing, Bungee Jumping, Paragliding and more!
-      </p>
-      <div className="mt-8">
-        <ActivitiesList />
-      </div>
-    </div>
+    <>
+      <HeroSection />
+      <FeaturedAdventures />     
+      <HowItWorks />
+      <ActivitySection />
+      <Testimonials />
+    </>
   );
 }

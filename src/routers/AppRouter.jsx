@@ -1,32 +1,38 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "../pages/LoginPage";
+import LoginPage from "../components/user/components/LoginModal";
 import Homepage from "../pages/Homepage";
-import RegisterPage from "../pages/RegisterPage";
-import MainLayout from "../layouts/MainLayout";
-
-// ✅ Admin imports
-import AdminLayout from "../layouts/admin/AdminLayout";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import Activities from "../pages/admin/Activities";
-import Bookings from "../pages/admin/Bookings";
-import Guides from "../pages/admin/Guides";
-import Customers from "../pages/admin/Customers";
-import Reviews from "../pages/admin/Reviews";
-import Analytics from "../pages/admin/Analytics";
-import Settings from "../pages/admin/Settings";
+import RegisterPage from "../components/user/components/RegisterModal";
 import ProtectedRoute from "../components/admin/common/ProtectedRoute";
+import CustomerLayout from "../components/user/layouts/CustomerLayout";
+import AdminLayout from "../layouts/admin/AdminLayout";
+import AdminDashboard from "../pages/admin/Dashboard";
+import ActivitiesTable from "../pages/admin/Activities";
+import EnhancedGuidesDashboard from "../pages/admin/Guides";
+import BookingsTable from "../pages/admin/Bookings";
+import CustomersProfile from "../pages/admin/Customers";
+import ReviewsTable from "../pages/admin/Reviews";
+import ProfilePage from "../pages/home/Profilepage";
+import ExplorePage from "../pages/home/ExplorePage";
+import ContactPage from "../pages/home/ContactPage";
+import AboutPage from "../pages/home/AboutUsPage";
+import MyBookingsPage from "../pages/home/MyBookingsPage";
+
+// import BookingsPage from "../pages/home/BookingsPage";
 
 const AppRouter = () => (
   <BrowserRouter>
     <Routes>
-      {/* 🌐 Public/User Routes */}
-      <Route element={<MainLayout />}>
+      <Route element={<CustomerLayout />}>
         <Route path="/" element={<Homepage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/customer" element={<Homepage />} />
+        <Route path="/profile" element={<ProfilePage />} /> 
+        <Route path="/explore" element={<ExplorePage />} /> 
+        <Route path="/contact" element={<ContactPage />} /> 
+        <Route path="/aboutus" element={<AboutPage />} /> 
+        <Route path="/mybookings" element={<MyBookingsPage />} /> 
+        {/* <Route path="/bookings" element={<BookingsPage />} /> */}
       </Route>
 
-      {/* 🛠️ Admin Routes */}
       <Route
         path="/admin/*"
         element={
@@ -35,18 +41,13 @@ const AppRouter = () => (
           </ProtectedRoute>
         }
       >
-        <Route index element={<AdminDashboard />} />
-        <Route path="activities" element={<Activities />} />
-        <Route path="bookings" element={<Bookings />} />
-        <Route path="guides" element={<Guides />} />
-        <Route path="customers" element={<Customers />} />
-        <Route path="reviews" element={<Reviews />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="settings" element={<Settings />} />
+        <Route index element={<AdminDashboard />} /> 
+        <Route path='activities' element={<ActivitiesTable />} /> 
+        <Route path='guides' element={<EnhancedGuidesDashboard />} /> 
+        <Route path='bookings' element={<BookingsTable />} /> 
+        <Route path='customers' element={<CustomersProfile />} />        
+        <Route path='reviews' element={<ReviewsTable/>} /> 
       </Route>
-
-      {/* 🔁 Redirect for unknown paths */}
-      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   </BrowserRouter>
 );
